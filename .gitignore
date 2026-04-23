@@ -1,0 +1,6 @@
+﻿# Windows temp files
+Thumbs.db
+Desktop.ini
+# PDF temp or logic files
+*.pdf.txt
+.DS_Store
