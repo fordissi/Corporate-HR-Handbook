@@ -2,7 +2,6 @@ import streamlit as st
 import os
 import re
 from pathlib import Path
-from streamlit_mermaid import st_mermaid
 
 # --- Configuration ---
 HANDBOOK_DIR = Path(r"c:\Users\fordi\antigravity\Personal Project\IDE_new_workstyle_test\HR\employee_handbook\Employee Handbook")
@@ -17,11 +16,34 @@ CATEGORIES = {
     "FM": "📋 表單附件 (Forms)",
 }
 
+CATEGORY_ORDER = list(CATEGORIES.values()) + ["💡 其他文件"]
+
+DOC_GROUPS = {
+    "ATT": "出勤與請假",
+    "GEN": "通用、會議與申訴",
+    "PAY": "薪資、津貼與獎金",
+    "PER": "績效與獎懲",
+    "REC": "招募與任用",
+    "SEP": "離職與交接",
+    "TRA": "教育訓練",
+    "TRV": "差旅管理",
+}
+
+
 def get_category(filename):
     for prefix, name in CATEGORIES.items():
         if f"HR-{prefix}-" in filename:
             return name
     return "💡 其他文件"
+
+
+def get_doc_group(filename):
+    match = re.match(r"HR-(?:FM|PR)-([A-Z]+)-", filename)
+    if not match:
+        return "其他"
+    code = match.group(1)
+    return DOC_GROUPS.get(code, code)
+
 
 def format_title(filename):
     # Remove extension
@@ -31,13 +53,106 @@ def format_title(filename):
         return f"[{parts[0]}] {parts[1]}"
     return name
 
+
+def dot_quote(value):
+    return '"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def parse_mermaid_node(expr, nodes):
+    expr = expr.strip().rstrip(";")
+    match = re.match(r"^([A-Za-z0-9_]+)\s*(?:\[([^\]]+)\]|\{([^}]+)\})?$", expr)
+    if not match:
+        return expr
+
+    node_id = match.group(1)
+    label = match.group(2) or match.group(3)
+    shape = "diamond" if match.group(3) else "box"
+    if label or node_id not in nodes:
+        nodes[node_id] = {
+            "label": label or node_id,
+            "shape": shape,
+        }
+    return node_id
+
+
+def mermaid_to_dot(code):
+    nodes = {}
+    edges = []
+    rankdir = "TB"
+
+    for raw_line in code.strip().splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("%%"):
+            continue
+        if line.startswith("flowchart") or line.startswith("graph"):
+            parts = line.split()
+            if len(parts) > 1 and parts[1] == "LR":
+                rankdir = "LR"
+            continue
+
+        style = "solid"
+        label = ""
+        source = target = None
+
+        if "-.->" in line:
+            source, target = line.split("-.->", 1)
+            style = "dotted"
+        else:
+            labelled = re.match(r"^(.*?)\s+--\s+(.*?)\s+-->\s+(.*?)$", line)
+            if labelled:
+                source, label, target = labelled.groups()
+            elif "-->" in line:
+                source, target = line.split("-->", 1)
+
+        if source is None or target is None:
+            continue
+
+        source_id = parse_mermaid_node(source, nodes)
+        target_id = parse_mermaid_node(target, nodes)
+        edges.append((source_id, target_id, label.strip(), style))
+
+    lines = [
+        "digraph G {",
+        f"  rankdir={rankdir};",
+        '  graph [bgcolor="transparent", pad="0.25", nodesep="0.45", ranksep="0.75"];',
+        '  node [fontname="Microsoft JhengHei", fontsize="13", color="#2563eb", penwidth="1.4", style="rounded,filled", fillcolor="#e0f2fe", fontcolor="#0f172a", margin="0.14,0.08"];',
+        '  edge [fontname="Microsoft JhengHei", fontsize="11", color="#475569", fontcolor="#334155", arrowsize="0.8"];',
+    ]
+
+    for node_id, node in nodes.items():
+        shape = "diamond" if node["shape"] == "diamond" else "box"
+        lines.append(f"  {dot_quote(node_id)} [label={dot_quote(node['label'])}, shape={shape}];")
+
+    for source_id, target_id, label, style in edges:
+        attrs = []
+        if label:
+            attrs.append(f"label={dot_quote(label)}")
+        if style == "dotted":
+            attrs.append('style="dotted"')
+        attr_text = f" [{', '.join(attrs)}]" if attrs else ""
+        lines.append(f"  {dot_quote(source_id)} -> {dot_quote(target_id)}{attr_text};")
+
+    lines.append("}")
+    return "\n".join(lines)
+
+
+def render_mermaid(code, index):
+    try:
+        st.graphviz_chart(mermaid_to_dot(code), use_container_width=True)
+    except Exception as error:
+        st.error(f"流程圖渲染失敗：{error}")
+        st.code(code, language="mermaid")
+
+
 def render_content_with_mermaid(text):
     pattern = r"```mermaid\n(.*?)\n```"
     parts = re.split(pattern, text, flags=re.DOTALL)
     is_mermaid = False
+    mermaid_index = 0
     for part in parts:
         if is_mermaid:
-            st_mermaid(part, height=500)
+            mermaid_index += 1
+            render_mermaid(part, mermaid_index)
         else:
             if part.strip():
                 st.markdown(part, unsafe_allow_html=True)
@@ -160,6 +275,18 @@ st.markdown("""
         color: #1e293b !important;
     }
 
+    .sidebar-group-label {
+        color: #64748b;
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        margin: 14px 0 6px;
+        padding: 6px 8px;
+        background: #f8fafc;
+        border-left: 3px solid #3b82f6;
+        border-radius: 4px;
+    }
+
     /* 5. Tables & Forms - Optimized for Physical Writing */
     .stMarkdown table {
         width: 100% !important;
@@ -242,12 +369,24 @@ default_file = "HR-MN-QM-01_員工管理手冊.md"
 if 'current_file' not in st.session_state:
     st.session_state.current_file = default_file if os.path.exists(HANDBOOK_DIR / default_file) else (all_files[0] if all_files else None)
 
-for cat_name, files in grouped_files.items():
+for cat_name in CATEGORY_ORDER:
+    files = grouped_files.get(cat_name, [])
     if not files: continue
     with st.sidebar.expander(cat_name, expanded=(cat_name == "📚 員工手冊 (Manuals)")):
-        for f in files:
-            if st.button(format_title(f), key=f, use_container_width=True):
-                st.session_state.current_file = f
+        if cat_name in {"📋 表單附件 (Forms)", "⚙️ 流程程序 (Procedures)"}:
+            grouped_by_function = {}
+            for f in files:
+                grouped_by_function.setdefault(get_doc_group(f), []).append(f)
+
+            for group_name in sorted(grouped_by_function):
+                st.markdown(f"<div class='sidebar-group-label'>{group_name}</div>", unsafe_allow_html=True)
+                for f in grouped_by_function[group_name]:
+                    if st.button(format_title(f), key=f, use_container_width=True):
+                        st.session_state.current_file = f
+        else:
+            for f in files:
+                if st.button(format_title(f), key=f, use_container_width=True):
+                    st.session_state.current_file = f
 
 # --- Main Area ---
 if st.session_state.current_file:
