@@ -1,4 +1,44 @@
+---
+doc_id: HR-PR-ATT-02
+title: 內勤人員出勤管理程序
+doc_type: procedure
+version: v0.1
+status: draft
+effective_date:
+owner_department: 人事課
+author: 蔡家瑋
+reviewer:
+approver:
+last_updated: 2026-07-06
+related_documents:
+  - HR-PR-ATT-04
+  - HR-FM-ATT-03
+  - HR-WI-ATT-01
+---
+
 # 內勤人員出勤管理程序 (HR-PR-ATT-02)
+
+## 文件資訊
+
+| 欄位 | 內容 |
+| --- | --- |
+| 文件編號 | HR-PR-ATT-02 |
+| 文件名稱 | 內勤人員出勤管理程序 |
+| 文件類型 | 程序書 |
+| 版本 | v0.1 |
+| 狀態 | 草稿（未發行） |
+| 制定單位 | 人事課 |
+| 制定者 | 蔡家瑋 |
+| 審核者 |  |
+| 核准者 |  |
+| 生效日 |  |
+| 最後更新日 | 2026-07-06 |
+
+## 文件履歷
+
+| 版本 | 日期 | 修訂內容 | 制定者 | 審核者 | 核准者 |
+| --- | --- | --- | --- | --- | --- |
+| v0.1 |  | 初版草案建立 | 蔡家瑋 |  |  |
 
 ## 一、 目的與適用範圍
 
