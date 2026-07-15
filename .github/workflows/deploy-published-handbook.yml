@@ -1,0 +1,37 @@
+name: Deploy Published Handbook
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "output/published_handbook/**"
+      - ".github/workflows/deploy-published-handbook.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload published handbook
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: output/published_handbook
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
