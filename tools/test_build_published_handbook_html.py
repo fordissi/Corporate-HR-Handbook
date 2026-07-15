@@ -27,6 +27,13 @@ class MermaidRenderingTests(unittest.TestCase):
 
 
 class SourceTableTests(unittest.TestCase):
+    def test_pay_procedure_preserves_both_salary_tables(self) -> None:
+        path = handbook.HANDBOOK_DIR / "HR-PR-PAY-01_津貼加給及獎金發放程序.md"
+        rendered = handbook.markdown_to_html(path.read_text(encoding="utf-8"))
+
+        self.assertEqual(rendered.count("<th>職系</th>"), 2)
+        self.assertEqual(rendered.count("<td>NT$19,000</td>"), 2)
+
     def test_pay_procedure_preserves_both_performance_factor_tables(self) -> None:
         path = handbook.HANDBOOK_DIR / "HR-PR-PAY-01_津貼加給及獎金發放程序.md"
         rendered = handbook.markdown_to_html(path.read_text(encoding="utf-8"))
