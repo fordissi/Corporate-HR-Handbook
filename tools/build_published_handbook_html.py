@@ -10,6 +10,13 @@ ROOT = Path(__file__).resolve().parents[1]
 HANDBOOK_DIR = ROOT / "Employee Handbook"
 OUTPUT_DIR = ROOT / "output" / "published_handbook"
 OUTPUT_FILE = OUTPUT_DIR / "index.html"
+PUBLICATION_TRACE_HEADINGS = {
+    "原始文件資訊",
+    "參考資料 Reference",
+    "附錄 Appendices",
+    "現行SOP表格",
+    "現行SOP來源",
+}
 
 ACTIVE_FILES = [
     "HR-MN-QM-01_員工管理手冊.md",
@@ -263,6 +270,39 @@ def markdown_to_html(markdown: str) -> str:
     return "\n".join(output)
 
 
+def strip_publication_trace_sections(markdown: str) -> str:
+    """Keep conversion provenance in Markdown while excluding it from public HTML."""
+
+    output: list[str] = []
+    skipped_level: int | None = None
+    in_code = False
+
+    for line in markdown.replace("\r\n", "\n").replace("\r", "\n").split("\n"):
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            in_code = not in_code
+
+        heading_match = None if in_code else re.match(r"^(#{1,6})\s+(.+)$", stripped)
+        if heading_match:
+            level = len(heading_match.group(1))
+            heading = heading_match.group(2).strip()
+            is_trace_heading = (
+                heading in PUBLICATION_TRACE_HEADINGS
+                or heading.startswith("原始文件履歷")
+            )
+            if is_trace_heading:
+                if skipped_level is None:
+                    skipped_level = level
+                continue
+            if skipped_level is not None and level <= skipped_level:
+                skipped_level = None
+
+        if skipped_level is None:
+            output.append(line)
+
+    return "\n".join(output)
+
+
 def load_documents() -> list[Document]:
     documents: list[Document] = []
     for file_name in ACTIVE_FILES:
@@ -276,7 +316,7 @@ def load_documents() -> list[Document]:
                 slug=slugify(doc_id),
                 metadata=metadata,
                 body=body,
-                html_body=markdown_to_html(body),
+                html_body=markdown_to_html(strip_publication_trace_sections(body)),
             )
         )
     return documents

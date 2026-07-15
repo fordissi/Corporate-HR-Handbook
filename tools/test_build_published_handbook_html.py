@@ -26,6 +26,22 @@ class MermaidRenderingTests(unittest.TestCase):
         self.assertIn('mermaid.initialize({ startOnLoad: true, securityLevel: "strict" });', html)
 
 
+class PublicationContentTests(unittest.TestCase):
+    def test_published_html_excludes_conversion_trace_sections(self) -> None:
+        html = handbook.build_html(handbook.load_documents())
+
+        self.assertNotIn(">原始文件資訊<", html)
+        self.assertNotIn(">原始文件履歷<", html)
+        self.assertNotIn(">原始文件履歷 Document Revision History<", html)
+        self.assertNotIn(">參考資料 Reference<", html)
+        self.assertNotIn(">附錄 Appendices<", html)
+        self.assertNotIn(">現行SOP表格<", html)
+        self.assertNotIn(">現行SOP來源<", html)
+        self.assertNotIn(">來源摘要<", html)
+        self.assertNotIn(">原始相關文件<", html)
+        self.assertNotIn(">現行SOP內容<", html)
+
+
 class SourceTableTests(unittest.TestCase):
     def test_pay_procedure_preserves_both_salary_tables(self) -> None:
         path = handbook.HANDBOOK_DIR / "HR-PR-PAY-01_津貼加給及獎金發放程序.md"
