@@ -17,5 +17,14 @@ class PrintTableLayoutTests(unittest.TestCase):
         self.assertIn("max-width: 100%;", html)
 
 
+class MermaidRenderingTests(unittest.TestCase):
+    def test_mermaid_blocks_include_the_runtime_renderer(self) -> None:
+        html = handbook.build_html(handbook.load_documents())
+
+        self.assertIn('<pre class="mermaid">', html)
+        self.assertIn('import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";', html)
+        self.assertIn('mermaid.initialize({ startOnLoad: true, securityLevel: "strict" });', html)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -202,7 +202,7 @@ def markdown_to_html(markdown: str) -> str:
                 language_class = f" language-{html.escape(code_language)}" if code_language else ""
                 code = html.escape("\n".join(code_lines))
                 if code_language == "mermaid":
-                    output.append(f"<figure class=\"code-block mermaid-block\"><figcaption>流程圖原始碼</figcaption><pre><code class=\"{language_class}\">{code}</code></pre></figure>")
+                    output.append(f"<figure class=\"mermaid-block\"><pre class=\"mermaid\">{code}</pre></figure>")
                 else:
                     output.append(f"<pre class=\"code-block\"><code class=\"{language_class}\">{code}</code></pre>")
                 code_lines = []
@@ -693,11 +693,24 @@ def build_html(documents: list[Document]) -> str:
       white-space: pre-wrap;
     }}
 
-    .mermaid-block figcaption {{
-      margin-bottom: 8px;
-      color: var(--muted);
-      font-size: 0.86rem;
-      font-weight: 700;
+    .mermaid-block {{
+      margin: 16px 0 24px;
+      padding: 18px;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      background: #fcfbf7;
+    }}
+
+    .mermaid {{
+      margin: 0;
+      background: transparent;
+      font-family: inherit;
+    }}
+
+    .mermaid svg {{
+      display: block;
+      max-width: 100%;
+      height: auto;
     }}
 
     .md-link {{
@@ -842,6 +855,14 @@ def build_html(documents: list[Document]) -> str:
         overflow-wrap: anywhere;
       }}
 
+      .mermaid-block {{
+        padding: 4mm;
+        overflow: visible;
+        background: white;
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }}
+
       .meta-item {{
         border-left: 0;
         padding-left: 0;
@@ -882,6 +903,10 @@ def build_html(documents: list[Document]) -> str:
       {sections}
     </main>
   </div>
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+    mermaid.initialize({{ startOnLoad: true, securityLevel: "strict" }});
+  </script>
 </body>
 </html>
 """.splitlines()) + "\n"
