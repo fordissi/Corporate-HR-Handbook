@@ -205,10 +205,56 @@
       box-shadow: var(--shadow);
     }
 
+    .document-details,
+    .related-document {
+      margin: 0;
+    }
+
+    .document-details > summary,
+    .related-document > summary {
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .document-details > summary::-webkit-details-marker,
+    .related-document > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .document-details > summary::after,
+    .related-document > summary::after {
+      content: "＋";
+      float: right;
+      color: var(--accent);
+      font-family: "Segoe UI", sans-serif;
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+
+    .document-details[open] > summary::after,
+    .related-document[open] > summary::after {
+      content: "−";
+    }
+
+    .document-details > summary:hover,
+    .related-document > summary:hover {
+      background: #f1eadc;
+    }
+
+    .document-details > summary:focus-visible,
+    .related-document > summary:focus-visible {
+      outline: 3px solid rgba(47, 111, 115, 0.35);
+      outline-offset: -3px;
+    }
+
     .document-cover {
       padding: 30px 34px 24px;
       border-bottom: 1px solid var(--line);
       background: linear-gradient(180deg, #fffdf8 0%, #f5efe1 100%);
+    }
+
+    .document-cover > div {
+      min-width: 0;
     }
 
     .eyebrow {
@@ -252,6 +298,54 @@
 
     .document-content {
       padding: 26px 34px 42px;
+    }
+
+    .office-guideline {
+      border-top: 4px solid #b67b36;
+    }
+
+    .office-guideline .document-cover {
+      background: linear-gradient(180deg, #fffaf1 0%, #f6ead5 100%);
+    }
+
+    .related-documents {
+      margin-top: 34px;
+      padding-top: 20px;
+      border-top: 2px solid var(--line);
+    }
+
+    .related-documents > h3 {
+      margin: 0 0 10px;
+      color: var(--accent-dark);
+    }
+
+    .related-document {
+      border: 1px solid var(--line);
+      background: #fcfbf7;
+    }
+
+    .related-document + .related-document {
+      margin-top: 8px;
+    }
+
+    .related-document > summary {
+      padding: 12px 16px;
+      color: var(--accent-dark);
+      font-weight: 800;
+    }
+
+    .related-doc-code {
+      display: inline-block;
+      margin-right: 12px;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.05em;
+    }
+
+    .related-content {
+      padding: 8px 18px 22px;
+      border-top: 1px solid var(--line);
+      background: white;
     }
 
     .document-content h1 {
@@ -445,6 +539,42 @@
         border-bottom: 1pt solid #000;
       }
 
+      .document-details > summary,
+      .related-document > summary {
+        cursor: default;
+      }
+
+      .document-details > summary::after,
+      .related-document > summary::after {
+        display: none;
+      }
+
+      .document-details:not([open]) > .document-content,
+      .related-document:not([open]) > .related-content {
+        display: block;
+      }
+
+      .related-documents {
+        margin-top: 8mm;
+        padding-top: 5mm;
+      }
+
+      .related-document {
+        border: 0;
+        page-break-inside: auto;
+        break-inside: auto;
+      }
+
+      .related-document > summary {
+        padding: 3mm 0;
+        border-bottom: 0.6pt solid #777;
+      }
+
+      .related-content {
+        padding: 3mm 0 5mm;
+        border-top: 0;
+      }
+
       .document h2,
       .document-content h1 {
         color: black;
@@ -533,26 +663,38 @@
       <nav class="nav" aria-label="文件目錄">
 
                 <section class="nav-group">
-                  <h2>文件總覽</h2>
-                  <a href="#hr-mn-qm-01"><span>HR-MN-QM-01</span>員工管理手冊</a>
+                  <h2>管理總覽</h2>
+                  <a class="nav-link" href="#hr-mn-qm-01"><span>HR-MN-QM-01</span>員工管理手冊</a>
                 </section>
 
 
                 <section class="nav-group">
                   <h2>出勤與請假</h2>
-                  <a href="#hr-pr-att-02"><span>HR-PR-ATT-02</span>員工出勤管理程序</a><a href="#hr-pr-att-01"><span>HR-PR-ATT-01</span>員工請假管理程序</a><a href="#hr-fm-att-01"><span>HR-FM-ATT-01</span>員工假別說明表</a><a href="#hr-pr-att-04"><span>HR-PR-ATT-04</span>加班申請作業程序</a>
+                  <a class="nav-link" href="#hr-pr-att-01"><span>HR-PR-ATT-01</span>員工請假管理程序</a><a class="nav-link nav-related" href="#hr-fm-att-01"><span>HR-FM-ATT-01</span>員工假別說明表</a><a class="nav-link" href="#hr-pr-att-02"><span>HR-PR-ATT-02</span>員工出勤管理程序</a><a class="nav-link" href="#hr-pr-att-04"><span>HR-PR-ATT-04</span>加班申請作業程序</a>
                 </section>
 
 
                 <section class="nav-group">
-                  <h2>差旅與薪酬</h2>
-                  <a href="#hr-pr-trv-01"><span>HR-PR-TRV-01</span>員工差旅管理程序</a><a href="#hr-pr-pay-01"><span>HR-PR-PAY-01</span>津貼加給及獎金發放程序</a>
+                  <h2>差旅與費用</h2>
+                  <a class="nav-link" href="#hr-pr-trv-01"><span>HR-PR-TRV-01</span>員工差旅管理程序</a>
                 </section>
 
 
                 <section class="nav-group">
-                  <h2>績效與離職</h2>
-                  <a href="#hr-pr-per-01"><span>HR-PR-PER-01</span>績效管理及獎懲程序</a><a href="#hr-pr-sep-01"><span>HR-PR-SEP-01</span>員工離職管理程序</a>
+                  <h2>薪酬與獎金</h2>
+                  <a class="nav-link" href="#hr-pr-pay-01"><span>HR-PR-PAY-01</span>津貼加給及獎金發放程序</a>
+                </section>
+
+
+                <section class="nav-group">
+                  <h2>績效與人員異動</h2>
+                  <a class="nav-link" href="#hr-pr-per-01"><span>HR-PR-PER-01</span>績效管理及獎懲程序</a><a class="nav-link" href="#hr-pr-sep-01"><span>HR-PR-SEP-01</span>員工離職管理程序</a>
+                </section>
+
+
+                <section class="nav-group">
+                  <h2>辦公室自主管理規範</h2>
+                  <a class="nav-link" href="#hr-wi-off-01"><span>HR-WI-OFF-01</span>辦公室公共事務與值日輪值說明</a>
                 </section>
 
       </nav>
@@ -590,13 +732,6 @@
 
         <article class="summary-card">
           <span>出勤與請假</span>
-          <strong>HR-FM-ATT-01</strong>
-          <p>員工假別說明表</p>
-        </article>
-
-
-        <article class="summary-card">
-          <span>出勤與請假</span>
           <strong>HR-PR-ATT-04</strong>
           <p>加班申請作業程序</p>
         </article>
@@ -629,10 +764,20 @@
           <p>員工離職管理程序</p>
         </article>
 
+
+        <article class="summary-card">
+          <span>OFF</span>
+          <strong>HR-WI-OFF-01</strong>
+          <p>辦公室公共事務與值日輪值說明</p>
+        </article>
+
       </section>
 
-        <section class="document" id="hr-mn-qm-01">
-          <header class="document-cover">
+    <section class="document" id="hr-mn-qm-01">
+      <details class="document-details">
+        <summary class="document-cover">
+          <span class="summary-marker" aria-hidden="true"></span>
+          <div>
             <p class="eyebrow">管理手冊 · 文件管理</p>
             <h2>員工管理手冊</h2>
             <div class="document-meta">
@@ -642,9 +787,10 @@
 <div class="meta-item"><span>最後更新</span><strong>2026-07-15</strong></div>
 <div class="meta-item"><span>分類</span><strong>管理手冊 / 文件管理</strong></div>
             </div>
-          </header>
-          <div class="document-content">
-            <h1>員工管理手冊 (HR-MN-QM-01)</h1>
+          </div>
+        </summary>
+        <div class="document-content">
+          <h1>員工管理手冊 (HR-MN-QM-01)</h1>
 <h2>文件資訊</h2>
 <div class="table-wrap"><table>
 <thead><tr>
@@ -1157,12 +1303,17 @@
 <p>公司受理後應依案件性質進行必要之保密、事實釐清、調查、保護措施及後續處理；不得因員工提出申訴、協助調查或提供資料而予以不利對待。</p>
 <p><strong>第五十三條、 補充規定</strong></p>
 <p>本規則若有法令修改、未盡事宜或涉及員工其他權利義務事項，本公司得視實際需要，按照有關法令規定辦理之。</p>
-          </div>
-        </section>
+
+        </div>
+      </details>
+    </section>
 
 
-        <section class="document" id="hr-pr-att-02">
-          <header class="document-cover">
+    <section class="document" id="hr-pr-att-02">
+      <details class="document-details">
+        <summary class="document-cover">
+          <span class="summary-marker" aria-hidden="true"></span>
+          <div>
             <p class="eyebrow">管理程序 · 出勤與請假</p>
             <h2>員工出勤管理程序</h2>
             <div class="document-meta">
@@ -1172,9 +1323,10 @@
 <div class="meta-item"><span>最後更新</span><strong>2026-07-14</strong></div>
 <div class="meta-item"><span>分類</span><strong>管理程序 / 出勤與請假</strong></div>
             </div>
-          </header>
-          <div class="document-content">
-            <h1>員工出勤管理程序 (HR-PR-ATT-02)</h1>
+          </div>
+        </summary>
+        <div class="document-content">
+          <h1>員工出勤管理程序 (HR-PR-ATT-02)</h1>
 <h2>文件資訊</h2>
 <div class="table-wrap"><table>
 <thead><tr>
@@ -1464,12 +1616,17 @@
 <td>薪資作業管理程序</td>
 </tr>
 </tbody></table></div>
-          </div>
-        </section>
+
+        </div>
+      </details>
+    </section>
 
 
-        <section class="document" id="hr-pr-att-01">
-          <header class="document-cover">
+    <section class="document" id="hr-pr-att-01">
+      <details class="document-details">
+        <summary class="document-cover">
+          <span class="summary-marker" aria-hidden="true"></span>
+          <div>
             <p class="eyebrow">管理程序 · 出勤與請假</p>
             <h2>員工請假管理程序</h2>
             <div class="document-meta">
@@ -1479,9 +1636,10 @@
 <div class="meta-item"><span>最後更新</span><strong>2026-07-14</strong></div>
 <div class="meta-item"><span>分類</span><strong>管理程序 / 出勤與請假</strong></div>
             </div>
-          </header>
-          <div class="document-content">
-            <h1>員工請假管理程序 (HR-PR-ATT-01)</h1>
+          </div>
+        </summary>
+        <div class="document-content">
+          <h1>員工請假管理程序 (HR-PR-ATT-01)</h1>
 <h2>文件資訊</h2>
 <div class="table-wrap"><table>
 <thead><tr>
@@ -1654,24 +1812,17 @@
 <li>曠職者除當日不給薪外，將嚴重影響年度績效評核。</li>
 <li>連續曠職 3 日或一個月累計 6 日者，公司得不經預告終止勞動契約。</li>
 </ul>
-          </div>
-        </section>
 
+    <section class="related-documents" aria-label="相關文件">
+      <h3>相關文件</h3>
 
-        <section class="document" id="hr-fm-att-01">
-          <header class="document-cover">
-            <p class="eyebrow">表單與說明表 · 出勤與請假</p>
-            <h2>員工假別說明表</h2>
-            <div class="document-meta">
-              <div class="meta-item"><span>文件編號</span><strong>HR-FM-ATT-01</strong></div>
-<div class="meta-item"><span>版本</span><strong>v1.0</strong></div>
-<div class="meta-item"><span>狀態</span><strong>已發行</strong></div>
-<div class="meta-item"><span>最後更新</span><strong>2026-07-13</strong></div>
-<div class="meta-item"><span>分類</span><strong>表單與說明表 / 出勤與請假</strong></div>
-            </div>
-          </header>
-          <div class="document-content">
-            <h1>員工假別說明表 (HR-FM-ATT-01)</h1>
+            <details class="related-document" id="hr-fm-att-01">
+              <summary>
+                <span class="related-doc-code">HR-FM-ATT-01</span>
+                <span>員工假別說明表</span>
+              </summary>
+              <div class="related-content">
+                <h1>員工假別說明表 (HR-FM-ATT-01)</h1>
 <h2>文件資訊</h2>
 <div class="table-wrap"><table>
 <thead><tr>
@@ -1964,12 +2115,21 @@
 <td>1. 適用於工作所在地、居住地或正常上下班必經地區經主管機關宣布停止上班，或因停止上課致員工需親自照顧家庭成員之情形。2. 員工應依公司請假流程提出申請，並檢附主管機關公告、居住地或通勤受影響之說明等佐證。3. 經核准之天災停班假，不視為曠工、遲到或未依規定請假，不扣全勤、考績，亦不得要求補行工作。4. 因營運需要經事前約定並經員工同意出勤者，公司應照給當日工資，並提供必要之通勤協助。</td>
 </tr>
 </tbody></table></div>
-          </div>
-        </section>
+              </div>
+            </details>
+
+    </section>
+
+        </div>
+      </details>
+    </section>
 
 
-        <section class="document" id="hr-pr-att-04">
-          <header class="document-cover">
+    <section class="document" id="hr-pr-att-04">
+      <details class="document-details">
+        <summary class="document-cover">
+          <span class="summary-marker" aria-hidden="true"></span>
+          <div>
             <p class="eyebrow">管理程序 · 出勤與請假</p>
             <h2>加班申請作業程序</h2>
             <div class="document-meta">
@@ -1979,9 +2139,10 @@
 <div class="meta-item"><span>最後更新</span><strong>2026-07-14</strong></div>
 <div class="meta-item"><span>分類</span><strong>管理程序 / 出勤與請假</strong></div>
             </div>
-          </header>
-          <div class="document-content">
-            <h1>加班申請作業程序 (HR-PR-ATT-04)</h1>
+          </div>
+        </summary>
+        <div class="document-content">
+          <h1>加班申請作業程序 (HR-PR-ATT-04)</h1>
 <h2>文件資訊</h2>
 <div class="table-wrap"><table>
 <thead><tr>
@@ -2218,12 +2379,17 @@
 <td>104企業大師手機打卡操作指南</td>
 </tr>
 </tbody></table></div>
-          </div>
-        </section>
+
+        </div>
+      </details>
+    </section>
 
 
-        <section class="document" id="hr-pr-trv-01">
-          <header class="document-cover">
+    <section class="document" id="hr-pr-trv-01">
+      <details class="document-details">
+        <summary class="document-cover">
+          <span class="summary-marker" aria-hidden="true"></span>
+          <div>
             <p class="eyebrow">管理程序 · 差旅與費用</p>
             <h2>員工差旅管理程序</h2>
             <div class="document-meta">
@@ -2233,9 +2399,10 @@
 <div class="meta-item"><span>最後更新</span><strong>2026-07-15</strong></div>
 <div class="meta-item"><span>分類</span><strong>管理程序 / 差旅與費用</strong></div>
             </div>
-          </header>
-          <div class="document-content">
-            <h1>員工差旅管理程序 (HR-PR-TRV-01)</h1>
+          </div>
+        </summary>
+        <div class="document-content">
+          <h1>員工差旅管理程序 (HR-PR-TRV-01)</h1>
 <h2>文件資訊</h2>
 <div class="table-wrap"><table>
 <thead><tr>
@@ -2464,12 +2631,17 @@
 <p>1. 員工於出差申請時，應於申請內容載明預計出發時間、出差活動時間、返回時間及預估半日或全日膳雜費。 2. 出差結束後，員工應於《差旅費報支單》(HR-FM-TRV-01) 填列實際出發、活動及返回時間，並勾選半日或全日補貼。 3. 直屬主管應依實際公務行程確認半日或全日判斷是否合理。 4. 財會課依核准之報支單辦理撥款；如行程時間、活動內容或餐食供應狀況不明，得請員工補充說明。 5. 膳雜費採定額補貼，原則上免檢附餐費發票；但交通、住宿及其他實報實銷項目仍應依規定檢附憑證。</p>
 <h2>八、 報支程序</h2>
 <p>1. <strong>時限</strong>：出差結束後 <strong>7 個工作日</strong> 內，應整理單據並填寫《差旅費報支單》(HR-FM-TRV-01) 及《差旅報告書》(HR-FM-TRV-02)。 2. <strong>憑證</strong>：除膳雜費採定額補貼外，其餘交通與住宿均需檢附正式發票或收據。</p>
-          </div>
-        </section>
+
+        </div>
+      </details>
+    </section>
 
 
-        <section class="document" id="hr-pr-pay-01">
-          <header class="document-cover">
+    <section class="document" id="hr-pr-pay-01">
+      <details class="document-details">
+        <summary class="document-cover">
+          <span class="summary-marker" aria-hidden="true"></span>
+          <div>
             <p class="eyebrow">管理程序 · 薪酬與獎金</p>
             <h2>津貼加給及獎金發放程序</h2>
             <div class="document-meta">
@@ -2479,9 +2651,10 @@
 <div class="meta-item"><span>最後更新</span><strong>2026-07-06</strong></div>
 <div class="meta-item"><span>分類</span><strong>管理程序 / 薪酬與獎金</strong></div>
             </div>
-          </header>
-          <div class="document-content">
-            <h1>津貼加給及獎金發放程序 (HR-PR-PAY-01)</h1>
+          </div>
+        </summary>
+        <div class="document-content">
+          <h1>津貼加給及獎金發放程序 (HR-PR-PAY-01)</h1>
 <h2>文件資訊</h2>
 <div class="table-wrap"><table>
 <thead><tr>
@@ -2739,12 +2912,17 @@
 <li><code>&gt; 15%</code>：1.50 ~ 2.00</li>
 </ul>
 <p>*註：若計算結果不足新台幣 2,000 元，則統一給予年節禮金 2,000 元。*</p>
-          </div>
-        </section>
+
+        </div>
+      </details>
+    </section>
 
 
-        <section class="document" id="hr-pr-per-01">
-          <header class="document-cover">
+    <section class="document" id="hr-pr-per-01">
+      <details class="document-details">
+        <summary class="document-cover">
+          <span class="summary-marker" aria-hidden="true"></span>
+          <div>
             <p class="eyebrow">管理程序 · 績效與獎懲</p>
             <h2>績效管理及獎懲程序</h2>
             <div class="document-meta">
@@ -2754,9 +2932,10 @@
 <div class="meta-item"><span>最後更新</span><strong>2026-07-06</strong></div>
 <div class="meta-item"><span>分類</span><strong>管理程序 / 績效與獎懲</strong></div>
             </div>
-          </header>
-          <div class="document-content">
-            <h1>績效管理及獎懲程序 (HR-PR-PER-01)</h1>
+          </div>
+        </summary>
+        <div class="document-content">
+          <h1>績效管理及獎懲程序 (HR-PR-PER-01)</h1>
 <h2>文件資訊</h2>
 <div class="table-wrap"><table>
 <thead><tr>
@@ -2924,12 +3103,17 @@
 <p>1. <strong>大過</strong>：年度績效考核分數扣 10 分。 2. <strong>小過</strong>：年度績效考核分數扣 6 分。 3. <strong>申誡</strong>：年度績效考核分數扣 2 分。 4. <strong>大功</strong>：年度績效考核分數加 5 分及禮金。 5. <strong>小功</strong>：年度績效考核分數加 3 分及禮金。 6. <strong>嘉獎</strong>：年度績效考核分數加 1 分及禮金。</p>
 <h2>七、 晉升與調薪</h2>
 <p>本公司依業務需要，對於經本公司升級（等）考試及格或考核（績）合格或合於獎勵之員工，得依其能力、考核成績、服務態度、工作勝任程度來進行調薪或調升其職務。</p>
-          </div>
-        </section>
+
+        </div>
+      </details>
+    </section>
 
 
-        <section class="document" id="hr-pr-sep-01">
-          <header class="document-cover">
+    <section class="document" id="hr-pr-sep-01">
+      <details class="document-details">
+        <summary class="document-cover">
+          <span class="summary-marker" aria-hidden="true"></span>
+          <div>
             <p class="eyebrow">管理程序 · 離職與交接</p>
             <h2>員工離職管理程序</h2>
             <div class="document-meta">
@@ -2939,9 +3123,10 @@
 <div class="meta-item"><span>最後更新</span><strong>2026-07-14</strong></div>
 <div class="meta-item"><span>分類</span><strong>管理程序 / 離職與交接</strong></div>
             </div>
-          </header>
-          <div class="document-content">
-            <h1>員工離職管理程序 (HR-PR-SEP-01)</h1>
+          </div>
+        </summary>
+        <div class="document-content">
+          <h1>員工離職管理程序 (HR-PR-SEP-01)</h1>
 <h2>文件資訊</h2>
 <div class="table-wrap"><table>
 <thead><tr>
@@ -3073,14 +3258,137 @@
 <p>1. 薪資將於離職手續完畢後之次月發薪日結清（包含未休特休之折算）。 2. 完成所有交接程序後，員工得請求人資部核發離職證明書。</p>
 <h2>八、 離職面談</h2>
 <p>人資單位應安排離職面談，了解員工離職真實原因，作為公司改善管理制度之參考。</p>
+
+        </div>
+      </details>
+    </section>
+
+
+    <section class="document office-guideline" id="hr-wi-off-01">
+      <details class="document-details">
+        <summary class="document-cover">
+          <span class="summary-marker" aria-hidden="true"></span>
+          <div>
+            <p class="eyebrow">作業指導書 · OFF</p>
+            <h2>辦公室公共事務與值日輪值說明</h2>
+            <div class="document-meta">
+              <div class="meta-item"><span>文件編號</span><strong>HR-WI-OFF-01</strong></div>
+<div class="meta-item"><span>版本</span><strong>v0.1</strong></div>
+<div class="meta-item"><span>狀態</span><strong>已發行</strong></div>
+<div class="meta-item"><span>最後更新</span><strong>2026-07-20</strong></div>
+<div class="meta-item"><span>分類</span><strong>作業指導書 / OFF</strong></div>
+            </div>
           </div>
-        </section>
+        </summary>
+        <div class="document-content">
+          <h1>辦公室公共事務與值日輪值說明 (HR-WI-OFF-01)</h1>
+<h2>文件資訊</h2>
+<div class="table-wrap"><table>
+<thead><tr>
+<th>欄位</th>
+<th>內容</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>文件編號</td>
+<td>HR-WI-OFF-01</td>
+</tr>
+<tr>
+<td>文件名稱</td>
+<td>辦公室公共事務與值日輪值說明</td>
+</tr>
+<tr>
+<td>文件類別</td>
+<td>辦公室自主管理規範</td>
+</tr>
+<tr>
+<td>版本</td>
+<td>v0.1</td>
+</tr>
+<tr>
+<td>狀態</td>
+<td>現行執行</td>
+</tr>
+<tr>
+<td>制定單位</td>
+<td>行政管理部</td>
+</tr>
+<tr>
+<td>最後更新日</td>
+<td>2026-07-20</td>
+</tr>
+</tbody></table></div>
+<h2>一、全體同仁日常提醒</h2>
+<p>為共同維護舒適、整潔且安全的工作環境，公司安排值日人員協助處理辦公室公共事務，並由財務部及客服部同仁每週輪流擔任。</p>
+<p>值日制度是為了確保公共事項有人定期確認，並不代表所有事情都只能由值日人員處理。辦公室環境需要全體同仁共同維護，若遇到可隨手完成的事項，也請大家主動協助。</p>
+<h3>1. 共同維護環境整潔</h3>
+<p>使用會議室、訪客區、廁所、影印區、茶水間及其他公共區域或設備後，請將物品歸位，並清理杯具、垃圾、水漬或其他髒污。</p>
+<h3>2. 垃圾分類及廚餘處理</h3>
+<p>公司垃圾分為資源回收、一般垃圾及廚餘，請依下列原則分類並投入指定容器：</p>
+<ul>
+<li><strong>資源回收：</strong> 紙類、寶特瓶、鋁罐、鐵罐及其他可回收物品。紙類、保麗龍的食物容器除外。</li>
+<li><strong>一般垃圾：</strong> 無法回收且不屬於廚餘的垃圾，例如使用過的衛生紙、髒污包裝及其他一般廢棄物。食物容器如有飲料或食物殘留，請先倒空並簡單清潔後再投入。</li>
+<li><strong>廚餘：</strong> 剩餘食物及可供廚餘回收的食品。投入前請先瀝除湯汁及水分，並去除塑膠袋、餐具、紙盒、橡皮筋等非廚餘物品。</li>
+</ul>
+<p>廚餘存放桶採冷藏保存，使用後請確認上蓋已完全閉合，以避免異味、滲漏或影響冷藏效果。如發現廚餘桶已滿，請勿繼續強行投入或將廚餘放置於桶外，應通知當週值日人員協助處理。值日人員應另取垃圾袋妥善盛裝後續廚餘，將袋口密封並暫時放置於指定位置，再視廚餘清運時間安排丟棄。</p>
+<p>若垃圾桶已滿、垃圾掉落、袋子破損或周圍有髒污，當下方便處理的同仁請先協助簡單整理，或通知值日人員進一步處理。</p>
+<h3>3. 協助回應門鈴</h3>
+<p>門鈴響起時，方便的同仁可協助確認來訪者身分；如為郵件或包裹投遞，請提醒值日人員協助處理。</p>
+<h3>4. 共同接待來訪賓客</h3>
+<p>請禮貌詢問來訪者姓名、公司及來訪事由，並通知受訪人員。受訪人員不在時，請引導訪客至等候區；如有需要，可協助提供咖啡或茶水，並通知值日人員。</p>
+<h3>5. 隨手節約能源</h3>
+<p>離開會議室或公共區域時，如確認無人繼續使用，請關閉空調、燈具及不必要的電源。</p>
+<h3>6. 最後離開者協助確認安全</h3>
+<p>較晚離開或為辦公室最後離開者，請協助確認門窗、空調、燈具及不必要的電源均已關閉。</p>
+<h2>二、值日人員主要負責事項</h2>
+<p>值日人員應於輪值期間主動確認下列事項；其他同仁如方便，也可協助處理。</p>
+<h3>1. 咖啡或茶水準備</h3>
+<p>依實際需要協助準備咖啡或茶水，主要情形包括：總經理飲品需求、主管或業務會議、來訪賓客。無相關需求時，不需固定準備。</p>
+<h3>2. 門鈴及收件協助</h3>
+<p>門鈴響起時，協助處理郵件或快遞、包裹或貨品、來訪賓客等事項。需要簽收的包裹或郵件，應先確認收件人或所屬部門；不確定是否可代收時，請詢問收件人或主管。</p>
+<h3>3. 公共區域環境巡視</h3>
+<p>每日適時巡視會議室、小會議室或訪客區、影印區、茶水區、廁所、垃圾桶及集中垃圾區。如發現物品凌亂、垃圾已滿、杯具未清洗或有明顯髒污，請協助簡單整理；超出可處理範圍時，通知相關人員處理。</p>
+<h3>4. 賓客接待</h3>
+<p>訪客到達時，協助詢問姓名、公司及來訪事由，通知受訪人員，並引導至會議室或等候區；視需要提供茶水。訪客離開後，協助整理桌面、杯具及相關區域，受訪人員亦應共同協助，不由值日人員單獨負責。</p>
+<h3>5. 廁所抽風設備</h3>
+<p>每日早上開始辦公後開啟廁所抽風設備，結束辦公前確認關閉。較早到班或較晚離開的同仁，也可協助處理。</p>
+<h3>6. 下班前安全巡視</h3>
+<p>確認門窗、空調、會議室及公共區域燈具、不必要的電子設備或電源，以及辦公室出入口管制狀況。巡視後如仍有同仁留在辦公室，請提醒最後離開者再次確認。</p>
+<h3>7. 每月電表及地下室大門</h3>
+<p>原則上每月 15 日配合台電抄表作業，確認抄表證件，並依需要協助地下室大門開關。</p>
+<h3>8. 樓下信箱巡視</h3>
+<p>每週至少一次巡視樓下信箱並將郵件帶回辦公室，依下列類型整理：公司正式郵件、員工或部門郵件、帳單及通知或公共文件、廣告郵件。正式郵件應儘速交付相關人員，廣告郵件則放置於指定位置或依公司方式處理。</p>
+<h2>三、輪值交接</h2>
+<p>每週輪值結束時，請將尚未完成、需後續追蹤或需特別注意的事項告知下一位值日人員。</p>
+<p>如因請假、出差或其他原因無法執行輪值，應事先協調代理人並完成交接。</p>
+<h2>四、共同維護原則</h2>
+<p>值日人員主要協助巡視、提醒及必要的支援，不代表所有使用後的整理或垃圾處理均由值日人員負責。</p>
+<p>全體同仁應共同遵守「自己使用、自己整理；看見需要、順手協助」的原則，維持整潔、安全且舒適的辦公環境。</p>
+
+        </div>
+      </details>
+    </section>
 
     </main>
   </div>
   <script type="module">
     import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
     mermaid.initialize({ startOnLoad: true, securityLevel: "strict" });
+
+    function openDocumentFromHash() {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      if (!id) return;
+
+      const target = document.getElementById(id);
+      if (!target) return;
+
+      const details = target.matches("details") ? target : target.closest("details");
+      if (details) details.open = true;
+      window.requestAnimationFrame(() => target.scrollIntoView({ block: "start" }));
+    }
+
+    window.addEventListener("hashchange", openDocumentFromHash);
+    openDocumentFromHash();
   </script>
 </body>
 </html>

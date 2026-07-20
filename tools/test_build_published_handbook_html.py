@@ -26,6 +26,37 @@ class MermaidRenderingTests(unittest.TestCase):
         self.assertIn('mermaid.initialize({ startOnLoad: true, securityLevel: "strict" });', html)
 
 
+class NavigationAndDisclosureTests(unittest.TestCase):
+    def test_documents_are_grouped_and_collapsed_on_screen(self) -> None:
+        html = handbook.build_html(handbook.load_documents())
+
+        self.assertIn("出勤與請假", html)
+        self.assertIn("辦公室自主管理規範", html)
+        self.assertIn('<details class="document-details">', html)
+        self.assertIn("HR-WI-OFF-01", html)
+        self.assertIn("辦公室公共事務與值日輪值說明", html)
+
+    def test_leave_explanation_is_nested_under_leave_procedure(self) -> None:
+        html = handbook.build_html(handbook.load_documents())
+
+        self.assertIn('<section class="related-documents" aria-label="相關文件">', html)
+        self.assertIn('<details class="related-document" id="hr-fm-att-01">', html)
+        self.assertEqual(html.count('id="hr-fm-att-01"'), 1)
+
+    def test_print_styles_expand_collapsed_documents(self) -> None:
+        html = handbook.build_html(handbook.load_documents())
+
+        self.assertIn(".document-details:not([open]) > .document-content", html)
+        self.assertIn(".related-document:not([open]) > .related-content", html)
+
+    def test_document_links_open_the_target_from_the_url_hash(self) -> None:
+        html = handbook.build_html(handbook.load_documents())
+
+        self.assertIn("function openDocumentFromHash()", html)
+        self.assertIn("window.addEventListener(\"hashchange\", openDocumentFromHash);", html)
+        self.assertIn("details.open = true;", html)
+
+
 class PublicationContentTests(unittest.TestCase):
     def test_published_html_excludes_conversion_trace_sections(self) -> None:
         html = handbook.build_html(handbook.load_documents())
