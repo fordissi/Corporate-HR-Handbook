@@ -28,14 +28,29 @@ ACTIVE_FILES = [
     "HR-PR-PAY-01_津貼加給及獎金發放程序.md",
     "HR-PR-PER-01_績效管理及獎懲程序.md",
     "HR-PR-SEP-01_員工離職管理程序.md",
+    "HR-WI-OFF-01_值日生工作.md",
 ]
 
-NAV_GROUPS = [
-    ("文件總覽", ["HR-MN-QM-01"]),
-    ("出勤與請假", ["HR-PR-ATT-02", "HR-PR-ATT-01", "HR-FM-ATT-01", "HR-PR-ATT-04"]),
-    ("差旅與薪酬", ["HR-PR-TRV-01", "HR-PR-PAY-01"]),
-    ("績效與離職", ["HR-PR-PER-01", "HR-PR-SEP-01"]),
+DOCUMENT_GROUPS = [
+    ("管理總覽", ["HR-MN-QM-01"]),
+    ("出勤與請假", ["HR-PR-ATT-01", "HR-PR-ATT-02", "HR-PR-ATT-04"]),
+    ("差旅與費用", ["HR-PR-TRV-01"]),
+    ("薪酬與獎金", ["HR-PR-PAY-01"]),
+    ("績效與人員異動", ["HR-PR-PER-01", "HR-PR-SEP-01"]),
+    ("辦公室自主管理規範", ["HR-WI-OFF-01"]),
 ]
+
+RELATED_DOCUMENTS = {
+    "HR-PR-ATT-01": ["HR-FM-ATT-01"],
+}
+
+CHILD_DOCUMENT_IDS = {
+    child_id
+    for child_ids in RELATED_DOCUMENTS.values()
+    for child_id in child_ids
+}
+
+OFFICE_SELF_MANAGEMENT_GROUP = "office_self_management"
 
 CATEGORY_LABELS = {
     "MN": "管理手冊",
@@ -337,19 +352,33 @@ def render_meta_items(document: Document) -> str:
     )
 
 
+def is_office_self_management(document: Document) -> bool:
+    return document.metadata.get("publication_group") == OFFICE_SELF_MANAGEMENT_GROUP
+
+
+def render_nav_link(document: Document, related: bool = False) -> str:
+    class_name = "nav-link nav-related" if related else "nav-link"
+    return (
+        f'<a class="{class_name}" href="#{document.slug}">'
+        f'<span>{html.escape(document.doc_id)}</span>{html.escape(document.title)}</a>'
+    )
+
+
 def render_nav(documents: list[Document]) -> str:
     documents_by_id = {document.doc_id: document for document in documents}
     groups: list[str] = []
 
-    for label, doc_ids in NAV_GROUPS:
+    for label, doc_ids in DOCUMENT_GROUPS:
         links = []
         for doc_id in doc_ids:
             document = documents_by_id.get(doc_id)
             if not document:
                 continue
-            links.append(
-                f"<a href=\"#{document.slug}\"><span>{html.escape(document.doc_id)}</span>{html.escape(document.title)}</a>"
-            )
+            links.append(render_nav_link(document))
+            for related_id in RELATED_DOCUMENTS.get(doc_id, []):
+                related = documents_by_id.get(related_id)
+                if related:
+                    links.append(render_nav_link(related, related=True))
         if links:
             groups.append(
                 f"""
@@ -363,8 +392,63 @@ def render_nav(documents: list[Document]) -> str:
     return "\n".join(groups)
 
 
+def render_related_documents(document: Document, documents_by_id: dict[str, Document]) -> str:
+    related = [documents_by_id[doc_id] for doc_id in RELATED_DOCUMENTS.get(document.doc_id, []) if doc_id in documents_by_id]
+    if not related:
+        return ""
+
+    items = []
+    for related_document in related:
+        items.append(
+            f"""
+            <details class="related-document" id="{related_document.slug}">
+              <summary>
+                <span class="related-doc-code">{html.escape(related_document.doc_id)}</span>
+                <span>{html.escape(related_document.title)}</span>
+              </summary>
+              <div class="related-content">
+                {related_document.html_body}
+              </div>
+            </details>
+            """
+        )
+
+    return f"""
+    <section class="related-documents" aria-label="相關文件">
+      <h3>相關文件</h3>
+      {''.join(items)}
+    </section>
+    """
+
+
+def render_document(document: Document, documents_by_id: dict[str, Document]) -> str:
+    document_class = "document office-guideline" if is_office_self_management(document) else "document"
+    return f"""
+    <section class="{document_class}" id="{document.slug}">
+      <details class="document-details">
+        <summary class="document-cover">
+          <span class="summary-marker" aria-hidden="true"></span>
+          <div>
+            <p class="eyebrow">{html.escape(document.category)} · {html.escape(document.function)}</p>
+            <h2>{html.escape(document.title)}</h2>
+            <div class="document-meta">
+              {render_meta_items(document)}
+            </div>
+          </div>
+        </summary>
+        <div class="document-content">
+          {document.html_body}
+          {render_related_documents(document, documents_by_id)}
+        </div>
+      </details>
+    </section>
+    """
+
+
 def build_html(documents: list[Document]) -> str:
     nav = render_nav(documents)
+    documents_by_id = {document.doc_id: document for document in documents}
+    visible_documents = [document for document in documents if document.doc_id not in CHILD_DOCUMENT_IDS]
     cards = "\n".join(
         f"""
         <article class="summary-card">
@@ -373,24 +457,11 @@ def build_html(documents: list[Document]) -> str:
           <p>{html.escape(document.title)}</p>
         </article>
         """
-        for document in documents
+        for document in visible_documents
     )
     sections = "\n".join(
-        f"""
-        <section class="document" id="{document.slug}">
-          <header class="document-cover">
-            <p class="eyebrow">{html.escape(document.category)} · {html.escape(document.function)}</p>
-            <h2>{html.escape(document.title)}</h2>
-            <div class="document-meta">
-              {render_meta_items(document)}
-            </div>
-          </header>
-          <div class="document-content">
-            {document.html_body}
-          </div>
-        </section>
-        """
-        for document in documents
+        render_document(document, documents_by_id)
+        for document in visible_documents
     )
 
     return "\n".join(line.rstrip() for line in f"""<!doctype html>
@@ -600,10 +671,56 @@ def build_html(documents: list[Document]) -> str:
       box-shadow: var(--shadow);
     }}
 
+    .document-details,
+    .related-document {{
+      margin: 0;
+    }}
+
+    .document-details > summary,
+    .related-document > summary {{
+      cursor: pointer;
+      list-style: none;
+    }}
+
+    .document-details > summary::-webkit-details-marker,
+    .related-document > summary::-webkit-details-marker {{
+      display: none;
+    }}
+
+    .document-details > summary::after,
+    .related-document > summary::after {{
+      content: "＋";
+      float: right;
+      color: var(--accent);
+      font-family: "Segoe UI", sans-serif;
+      font-size: 1.4rem;
+      line-height: 1;
+    }}
+
+    .document-details[open] > summary::after,
+    .related-document[open] > summary::after {{
+      content: "−";
+    }}
+
+    .document-details > summary:hover,
+    .related-document > summary:hover {{
+      background: #f1eadc;
+    }}
+
+    .document-details > summary:focus-visible,
+    .related-document > summary:focus-visible {{
+      outline: 3px solid rgba(47, 111, 115, 0.35);
+      outline-offset: -3px;
+    }}
+
     .document-cover {{
       padding: 30px 34px 24px;
       border-bottom: 1px solid var(--line);
       background: linear-gradient(180deg, #fffdf8 0%, #f5efe1 100%);
+    }}
+
+    .document-cover > div {{
+      min-width: 0;
     }}
 
     .eyebrow {{
@@ -647,6 +764,54 @@ def build_html(documents: list[Document]) -> str:
 
     .document-content {{
       padding: 26px 34px 42px;
+    }}
+
+    .office-guideline {{
+      border-top: 4px solid #b67b36;
+    }}
+
+    .office-guideline .document-cover {{
+      background: linear-gradient(180deg, #fffaf1 0%, #f6ead5 100%);
+    }}
+
+    .related-documents {{
+      margin-top: 34px;
+      padding-top: 20px;
+      border-top: 2px solid var(--line);
+    }}
+
+    .related-documents > h3 {{
+      margin: 0 0 10px;
+      color: var(--accent-dark);
+    }}
+
+    .related-document {{
+      border: 1px solid var(--line);
+      background: #fcfbf7;
+    }}
+
+    .related-document + .related-document {{
+      margin-top: 8px;
+    }}
+
+    .related-document > summary {{
+      padding: 12px 16px;
+      color: var(--accent-dark);
+      font-weight: 800;
+    }}
+
+    .related-doc-code {{
+      display: inline-block;
+      margin-right: 12px;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.05em;
+    }}
+
+    .related-content {{
+      padding: 8px 18px 22px;
+      border-top: 1px solid var(--line);
+      background: white;
     }}
 
     .document-content h1 {{
@@ -840,6 +1005,42 @@ def build_html(documents: list[Document]) -> str:
         border-bottom: 1pt solid #000;
       }}
 
+      .document-details > summary,
+      .related-document > summary {{
+        cursor: default;
+      }}
+
+      .document-details > summary::after,
+      .related-document > summary::after {{
+        display: none;
+      }}
+
+      .document-details:not([open]) > .document-content,
+      .related-document:not([open]) > .related-content {{
+        display: block;
+      }}
+
+      .related-documents {{
+        margin-top: 8mm;
+        padding-top: 5mm;
+      }}
+
+      .related-document {{
+        border: 0;
+        page-break-inside: auto;
+        break-inside: auto;
+      }}
+
+      .related-document > summary {{
+        padding: 3mm 0;
+        border-bottom: 0.6pt solid #777;
+      }}
+
+      .related-content {{
+        padding: 3mm 0 5mm;
+        border-top: 0;
+      }}
+
       .document h2,
       .document-content h1 {{
         color: black;
@@ -946,6 +1147,21 @@ def build_html(documents: list[Document]) -> str:
   <script type="module">
     import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
     mermaid.initialize({{ startOnLoad: true, securityLevel: "strict" }});
+
+    function openDocumentFromHash() {{
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      if (!id) return;
+
+      const target = document.getElementById(id);
+      if (!target) return;
+
+      const details = target.matches("details") ? target : target.closest("details");
+      if (details) details.open = true;
+      window.requestAnimationFrame(() => target.scrollIntoView({{ block: "start" }}));
+    }}
+
+    window.addEventListener("hashchange", openDocumentFromHash);
+    openDocumentFromHash();
   </script>
 </body>
 </html>
